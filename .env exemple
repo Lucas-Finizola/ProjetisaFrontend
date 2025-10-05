@@ -1,0 +1,8 @@
+# Configuração da API do Strapi
+REACT_APP_STRAPI_API_URL=http://localhost:1337
+
+# Configuração de desenvolvimento
+REACT_APP_ENV=development
+
+# Configuração de debug (opcional)
+REACT_APP_DEBUG_API=false
