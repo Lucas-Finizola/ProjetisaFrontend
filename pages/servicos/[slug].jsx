@@ -45,11 +45,7 @@ const ServiceDetail = ({ service }) => {
                         {imageUrl && <img src={imageUrl} alt={attributes.title} className="w-full h-auto object-cover" onError={(e) => { e.target.onerror = null; e.target.src='https://via.placeholder.com/800x400/cccccc/000000?text=Erro+na+Imagem'; }}/>}
                     </div>
 
-                    {attributes.content && (
-                      <div className="prose prose-lg max-w-none prose-h2:font-bold prose-p:text-gray-700 prose-a:text-green-600">
-                          <ReactMarkdown>{attributes.content}</ReactMarkdown>
-                      </div>
-                    )}
+                   {attributes.contentBlocks && <ContentBlockRenderer contentBlocks={attributes.contentBlocks} />}
 
                     <div className="mt-12 py-10 border-t border-gray-200 text-center">
                       <h3 className="text-2xl font-bold text-gray-800 mb-4">Pronto para começar?</h3>

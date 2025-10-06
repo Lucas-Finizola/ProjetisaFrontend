@@ -60,11 +60,7 @@ const NoticiaDetail = ({ noticia }) => {
             Voltar para todas as notícias
           </Link>
 
-          {attributes.content && (
-            <div className="prose prose-lg max-w-none prose-h2:font-bold prose-p:text-gray-700 prose-a:text-green-600">
-              <ReactMarkdown>{attributes.content}</ReactMarkdown>
-            </div>
-          )}
+          {attributes.contentBlocks && <ContentBlockRenderer contentBlocks={attributes.contentBlocks} />}
 
           {/* Tags se existirem */}
           {attributes.tags && attributes.tags.length > 0 && (

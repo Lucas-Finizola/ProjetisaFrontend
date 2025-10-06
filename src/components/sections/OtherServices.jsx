@@ -1,13 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { ArrowRight, Building, Zap, Construction } from 'lucide-react';
+import { ArrowRight, Building, Zap, Construction, Sun } from 'lucide-react';
 
-// Adapte este mapa de ícones para corresponder aos seus serviços
+// Mapa que conecta o texto do campo 'icon' no Strapi ao componente de ícone
 const iconMap = {
   default: <Building className="w-10 h-10" />,
   redes: <Zap className="w-10 h-10" />,
   obras: <Construction className="w-10 h-10" />,
+  solar: <Sun className="w-10 h-10" />,
 };
 
 const OtherServices = ({ services }) => {
@@ -21,7 +22,7 @@ const OtherServices = ({ services }) => {
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">Além da energia solar, oferecemos um portfólio completo para grandes projetos.</p>
         </motion.div>
 
-        <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {services.map((service, index) => (
             <motion.div
               key={service.id}
@@ -30,10 +31,10 @@ const OtherServices = ({ services }) => {
               transition={{ delay: index * 0.1 }}
               viewport={{ once: true }}
               whileHover={{ y: -5 }}
-              className="bg-gray-50 p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 text-center"
+              className="bg-gray-50 p-8 rounded-xl hover:shadow-xl transition-all duration-300 text-center"
             >
               <div className="text-green-600 mb-5 flex justify-center">
-                {/* Acessando o ícone pelo nome que você definir no Strapi */}
+                {/* CORREÇÃO: Renderiza o ícone com base no texto do campo 'icon' */}
                 {iconMap[service.attributes.icon] || iconMap.default}
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-3">{service.attributes.title}</h3>
@@ -43,11 +44,9 @@ const OtherServices = ({ services }) => {
         </div>
 
         <div className="text-center mt-16">
-          <Link href="/servicos" legacyBehavior>
-            <a className="bg-green-600 text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-green-700 transition-transform transform hover:scale-105 shadow-lg inline-flex items-center">
-              <span>Conheça Todos os Serviços</span>
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </a>
+          <Link href="/servicos" className="bg-green-600 text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-green-700 transition-transform transform hover:scale-105 shadow-lg inline-flex items-center">
+            <span>Conheça Todos os Serviços</span>
+            <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>
       </div>

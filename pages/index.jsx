@@ -1,84 +1,85 @@
 import React from 'react';
 import { fetchAPI } from '../utils/strapiUtils';
 
-// Importando TODOS os componentes de seção
+// Importando os componentes de seção
 import HeroSection from '../src/components/sections/HeroSection';
 import UrgencyBanner from '../src/components/sections/UrgencyBanner';
 import Benefits from '../src/components/sections/Benefits';
 import Process from '../src/components/sections/Process';
-import FeaturedProjects from '../src/components/sections/FeaturedProjects';
-import Testimonials from '../src/components/sections/Testimonials';
-import FaqSection from '../src/components/sections/FaqSection';
 import FinalCTA from '../src/components/sections/FinalCTA';
-import VideoSection from '../src/components/sections/VideoSection';
-import OtherServices from '../src/components/sections/OtherServices';
 
-// Mapa que conecta os nomes do Strapi aos componentes React
+// Mapa dos componentes da Dynamic Zone
 const componentMap = {
   'sections.hero-section': HeroSection,
   'sections.urgency-banner': UrgencyBanner,
-  'sections.benefits': Benefits, // Assumindo que o nome do componente no Strapi será "Benefits"
-  'sections.process': Process,     // Assumindo que o nome do componente no Strapi será "Process"
+  'sections.benefits-section': Benefits,
+  'sections.process-section': Process,
   'sections.final-cta': FinalCTA,
 };
 
-const Home = ({ homePageData, projects, faqs, teamMembers, videos, services }) => {
-  // Condição de carregamento CORRIGIDA para 'sections'
-  if (!homePageData || !homePageData.sections) {
-    return <div className="text-center p-8">Carregando conteúdo... Verifique se o Strapi está rodando e se a "About Page" tem seções publicadas na Dynamic Zone.</div>;
+const Home = ({ homePageData, error }) => {
+  if (error) {
+    return (
+      <div className="text-center p-8 min-h-screen">
+        <h1 className="text-2xl font-bold text-red-600">Ocorreu um Erro ao Carregar a Página</h1>
+        <p className="mt-4 text-gray-700">Detalhes do erro:</p>
+        <pre className="mt-2 p-4 bg-gray-100 rounded text-left whitespace-pre-wrap">{error}</pre>
+      </div>
+    );
   }
-
-  // Desestruturação CORRIGIDA para 'sections'
-  const { sections } = homePageData;
-
-  const scrollToHeroForm = () => {
-    document.getElementById('simulacao-form')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  };
+  
+  const sections = homePageData?.sections || [];
 
   return (
     <div className="min-h-screen bg-white">
-      {sections.map((section, index) => {
+      {sections.map((section) => {
         const Component = componentMap[section.__component];
-        if (!Component) {
-          console.warn(`Componente não mapeado no index.jsx: ${section.__component}`);
-          return null;
+        if (Component) {
+          return <Component key={`${section.__component}-${section.id}`} data={section} />;
         }
-        return <Component key={index} data={section} scrollToForm={scrollToHeroForm} />;
+        return null;
       })}
-
-      <FeaturedProjects projects={projects} />
-      <VideoSection videos={videos} />
-      <OtherServices services={services} />
-      <FaqSection faqs={faqs} />
-      <Testimonials testimonials={teamMembers} />
     </div>
   );
 };
 
 export async function getStaticProps() {
+  const detailedPopulate = {
+    sections: {
+      on: {
+        'sections.hero-section': { populate: '*' },
+        'sections.urgency-banner': { populate: '*' },
+        'sections.benefits-section': { populate: '*' },
+        'sections.process-section': { populate: '*' },
+        'sections.final-cta': { populate: '*' },
+      },
+    },
+  };
+
   try {
-    const [homePageRes, projectsRes, faqsRes, teamMembersRes, videosRes, servicesRes] = await Promise.all([
-      fetchAPI('/about-page', { populate: 'deep' }), // 'deep' é mais robusto que '*' para nested components
-      fetchAPI('/projects', { pagination: { limit: 3 }, populate: 'coverImage' }),
-      fetchAPI('/faqs'),
-      fetchAPI('/team-members', { pagination: { limit: 3 }, populate: 'photo' }),
-      fetchAPI('/feedback-videos', { populate: 'thumbnail' }),
-      fetchAPI('/services', { pagination: { limit: 3 } })
-    ]);
+    const homePageRes = await fetchAPI('/home', { populate: detailedPopulate });
+
+    // A verificação de segurança MAIS IMPORTANTE:
+    const homePageData = homePageRes.data?.attributes || null;
+
+    if (!homePageData) {
+      throw new Error("Dados da Home não encontrados. Verifique se a página 'Home' está PUBLICADA no Strapi e se as permissões para 'Public' estão corretas.");
+    }
 
     return {
       props: {
-        homePageData: homePageRes.data || null,
-        projects: projectsRes.data || [],
-        faqs: faqsRes.data || [],
-        teamMembers: teamMembersRes.data || [],
-        videos: videosRes.data || [],
-        services: servicesRes.data || [],
+        homePageData: homePageData, // Agora é garantido que seja um objeto ou null
+        error: null,
       },
     };
   } catch (error) {
-    console.error("Erro ao buscar dados do Strapi para a Home:", error);
-    return { props: { homePageData: null, projects: [], faqs: [], teamMembers: [], videos: [], services: [] } };
+    console.error("ERRO FINAL EM GETSTATICPROPS:", error.message);
+    return {
+      props: {
+        homePageData: null,
+        error: error.message,
+      },
+    };
   }
 }
 

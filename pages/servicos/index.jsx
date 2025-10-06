@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link'; // Alterado para next/link
 import { ArrowRight, Grid, List } from 'lucide-react';
+import BlocksRenderer from '../../src/components/common/BlocksRenderer'; // <-- Adicione esta linha
 import { fetchAPI, getStrapiMedia } from '../../utils/strapiUtils'; // Usando fetchAPI e getStrapiMedia
 
 const Services = ({ services }) => {
@@ -63,7 +64,7 @@ const Services = ({ services }) => {
                     {service.attributes.title}
                   </h3>
                   <p className="text-gray-600 mb-4 line-clamp-3">
-                    {service.attributes.description}
+                    {service.attributes.summary}
                   </p>
                   <Link
                     href={`/servicos/${service.attributes.slug}`}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import BlocksRenderer from '../common/BlocksRenderer'; // Precisa importar o renderer
 
 const FaqSection = ({ faqs }) => {
   if (!faqs || faqs.length === 0) return null;
@@ -22,12 +23,12 @@ const FaqSection = ({ faqs }) => {
               viewport={{ once: true }}
               className="bg-white p-6 rounded-xl shadow-lg"
             >
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">{faq.attributes.pergunta}</h3>
-              {/* O Rich Text do Strapi vem como um array de blocos, precisamos mapeá-los */}
-              <div className="text-gray-700 space-y-2">
-                {faq.attributes.resposta.map(block => 
-                  block.children.map(child => <p key={child.text}>{child.text}</p>)
-                )}
+              {/* Nome do campo correto: 'question' */}
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">{faq.attributes.question}</h3>
+              
+              {/* Renderiza a resposta com o BlocksRenderer */}
+              <div className="text-gray-700 space-y-2 prose">
+                <BlocksRenderer content={faq.attributes.answer} />
               </div>
             </motion.div>
           ))}

@@ -3,9 +3,9 @@ import { motion } from 'framer-motion';
 import { PlayCircle, X } from 'lucide-react';
 import { getStrapiMedia } from '../../../utils/strapiUtils';
 
-// Componente Modal para exibir o vídeo
 const VideoModal = ({ video, onClose }) => {
-  const videoUrl = getStrapiMedia(video.attributes.video);
+  // CORREÇÃO: Usando 'videoFile' para obter a URL do vídeo
+  const videoUrl = getStrapiMedia(video.attributes.videoFile);
   if (!videoUrl) {
     onClose();
     return null;
@@ -40,7 +40,6 @@ const VideoModal = ({ video, onClose }) => {
 
 const VideoSection = ({ videos }) => {
   const [selectedVideo, setSelectedVideo] = useState(null);
-
   if (!videos || videos.length === 0) return null;
 
   return (
@@ -53,7 +52,8 @@ const VideoSection = ({ videos }) => {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {videos.map((video, index) => {
-            const { nomeCliente, thumbnail } = video.attributes;
+            // CORREÇÃO: Usando 'clientName' em vez de 'nomeCliente'
+            const { clientName, thumbnail } = video.attributes;
             const thumbnailUrl = getStrapiMedia(thumbnail);
             return (
               <motion.div
@@ -67,24 +67,23 @@ const VideoSection = ({ videos }) => {
                 whileHover={{ y: -5, boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)" }}
               >
                 <div className="relative aspect-video bg-black">
-                  <img src={thumbnailUrl || 'https://placehold.co/600x400/334155/FFFFFF?text=Video'} alt={`Capa do depoimento de ${nomeCliente}`} className="w-full h-full object-cover" />
+                  <img src={thumbnailUrl || 'https://placehold.co/600x400/334155/FFFFFF?text=Video'} alt={`Capa do depoimento de ${clientName}`} className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-40 transition-all duration-300" />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <PlayCircle className="w-16 h-16 text-white drop-shadow-lg transform group-hover:scale-110 transition-transform" />
                   </div>
                 </div>
                 <div className="p-4">
-                  <h3 className="text-lg font-semibold text-gray-900 truncate" title={nomeCliente}>{nomeCliente}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 truncate" title={clientName}>{clientName}</h3>
                 </div>
               </motion.div>
             );
           })}
         </div>
       </div>
-      {/* AnimatePresence é do framer-motion, para animar a saída do modal */}
-      <motion.AnimatePresence>
+      <motion.div>
         {selectedVideo && <VideoModal video={selectedVideo} onClose={() => setSelectedVideo(null)} />}
-      </motion.AnimatePresence>
+      </motion.div>
     </section>
   );
 };
